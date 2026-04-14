@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"> <!-- 💡 Define o padrão de caracteres (permite acentos) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes</title>
+
+
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script src="assets/js/main.js"></script>
+
+</head>
+
+<body>
+
+    <nav>
+        <div>
+            <!-- 🏨 Logotipo / Nome do Hotel -->
+            <a href="/">🏨 Hotel Caribe Azul</a>
+            <!-- 📱 Botão que aparece em telas pequenas (menu colapsável) -->
+            <button type="button">
+                <span></span>
+            </button>
+            <!-- 🧭 Itens de navegação -->
+            <div id="navbarNav">
+                <ul>
+                    <li>
+                        <!-- Página atual: Cadastro -->
+                        <a href="/">🏠 Cadastro</a>
+                    </li>
+                    <li>
+                        <!-- Link para a página de consulta -->
+                        <a href="/consulta">🔍 Consultar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <form id="formCadastro">
+        <div>
+            <div>
+                <label> Nome:</label>
+                <input type="text" name="nome" required>
+            </div>
+        </div>
+        <div>
+            <div>
+                <label> CPF:</label>
+                <input type="text" name="cpf" required>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label> Email:</label>
+                <input type="email" name="email" required>
+            </div>
+        </div>
+        <div>
+            <div>
+                <label> Telefone:</label>
+                <input type="text" name="telefone" required>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label> Endereço:</label>
+                <input type="text" name="endereco" required>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label> Observação:</label>
+                <textarea type="text" name="observacao" required>
+            </div>
+        </div>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+</body>
+
+</html>

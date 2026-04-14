@@ -53,4 +53,68 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(dados);
         });
     }
+
+    if (btnBuscar) {
+        btnBuscar.addEventListener('click', async () => {
+            //pega o nome digitado pelo usuario
+            const nome= document.getElementById('campoBusca').value;
+            //🚀 faz uma requisição GET ao Flask, enviando o nome como parâmetro
+            const resp = await fetch(`/bucar?nome=${nome}`);
+            const clientes = await resp.json(); //🕹️ recebe lista de clientes
+
+            const tabela = document.getElementById('tabelaResultados');
+            tabela.innerHTML = ''; //Limpa a tabela antes de exibir os novos resultados
+
+            // Para cada clientes retornado, cria uma nova linha na tabela HTML
+            clientes.forEach(cli => {
+               const row =`
+               <tr>
+                <td>${cli.ID}</td>
+                <td>${cli.Nome}</td>
+                <td>${cli.CPF}</td>
+                <td>${cli.Email}</td>
+                <td>${cli.Telefone}</td>
+                <td><ahref="/alterar?id=${cli.ID}" class="bnt bnt-sm bnt-warning"> Editar</a></td>
+               </tr>`;
+               tabela.innerHTML += row;
+            });
+        
+
+        });
+    }
+
+
+    formAlterar.addEventListener('submit', async (e) =>{
+        e.preventDefault()
+
+        // monta um objeto com os novos  dados digitais
+        const dados ={
+            nome: nome.value,
+            CPF: cpf.value,
+            email: email.value
+            telefone: telefone.value
+            endereco: endereco.value
+            observacoes: observacoes.value
+        };
+         
+        //envia para o backend (rotas /apii/atualizar/<idv>)
+        const resp = await fetch(`/api/atualizar/${id}`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json'},
+            body: JSON.stringify(dados)
+         });
+  
+         const result = await resp.json();
+         mensagem.ineerText = result.message; // mostra o retorno na tela
+  
+      });
+  
+    
+    
+
+
+
+    
+    
+
 });
