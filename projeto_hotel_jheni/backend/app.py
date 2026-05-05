@@ -1,46 +1,30 @@
-# =============================================================================
-# ⚙️ backend/app.py
-# =============================================================================
-# 💡 Este é o coração do nosso sistema!
-# Aqui criamos um pequeno SERVIDOR WEB com Flask, que:
-# 1️⃣ Responde às requisições do navegador (frontend);
-# 2️⃣ Manipula os dados enviados (cadastro, consulta, alteração);
-# 3️⃣ Salva tudo dentro de um arquivo Excel (.xlsx), que funciona
-#    como o "banco de dados" do sistema.
-# =============================================================================
-
-import os  # 📁 Biblioteca para lidar com diretórios e caminhos de arquivos
-from flask import (
-    Flask,
-    request,
-    jsonify,
-    send_from_directory,
-)  # 🌐 Importa o framework Flask e funções úteis
+import os
+from flask import Flask, request, jsonify, send_from_directory
 import openpyxl  # 📊 Biblioteca para ler e escrever planilhas Excel (.xlsx)
 from datetime import (
     datetime,
 )  # ⏰ Para registrar a data de cada cadastro automaticamente
 
-# =============================================================================
-# 🧠 INICIALIZAÇÃO DO SERVIDOR FLASK
-# =============================================================================
-# 💡 Aqui criamos a “instância” do Flask, que será o servidor web.
-# - static_folder → indica onde estão os arquivos estáticos (CSS, JS, imagens)
-# - static_url_path → define o caminho usado no navegador para acessá-los
-# =============================================================================
-app = Flask(__name__, static_folder="../static", static_url_path="/static")
 
-# =============================================================================
-# ⚙️ CONFIGURAÇÕES GERAIS E CONSTANTES
-# =============================================================================
+# Caminho base do projeto (uma pasta acima do backend)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# C:\Users\psicoton\Documents\PSS SEED\Logica de Programação\projeto_hotel_Guido
+# Pasta frontend (HTML e JS)
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
+# C:\Users\psicoton\Documents\PSS SEED\Logica de Programação\projeto_hotel_Guido\frontend
+#
+# Pasta static (CSS)
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+# C:\Users\psicoton\Documents\PSS SEED\Logica de Programação\projeto_hotel_Guido\static
+
 # 💾 Aqui definimos os diretórios e o nome do arquivo Excel que servirá de banco.
 # =============================================================================
 DB_DIR = os.path.join(
     os.path.dirname(__file__), "..", "db"
 )  # Pasta onde ficará o banco de dados
-EXCEL_FILE = os.path.join(
-    DB_DIR, "clientes.xlsx"
-)  # Caminho completo até o arquivo Excel
+# C:\Users\psicoton\Documents\PSS SEED\Logica de Programação\projeto_hotel_Guido\db
+EXCEL_FILE = os.path.join(DB_DIR, "clientes.xlsx")
+# C:\Users\psicoton\Documents\PSS SEED\Logica de Programação\projeto_hotel_Guido\db\clientes.xlsx
 
 # Cabeçalhos das colunas do Excel (linha 1)
 COLUMNS = [
@@ -73,30 +57,29 @@ def init_excel():
         workbook.save(EXCEL_FILE)  # Salva o arquivo Excel
 
 
-# =============================================================================
-# 📂 ROTAS DE PÁGINAS HTML (FRONTEND)
-# =============================================================================
-# 💡 As rotas abaixo enviam os arquivos HTML para o navegador quando o
-#    usuário acessa os endereços correspondentes.
-# =============================================================================
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/" + STATIC_DIR)
 
 
+# =========================
+# ROTA PRINCIPAL (HTML)
+# ROTAS DAS PÁGINAS (FRONTEND)
+# Página inicial (Cadastro/index.html)
+# =========================
 @app.route("/")
-def index():
-    # 🏠 Página inicial (cadastro de cliente)
-    return send_from_directory("../frontend", "index.html")
+def home():
+    return send_from_directory(FRONTEND_DIR, "index.html")
 
 
+# Página de Consulta
 @app.route("/consulta")
 def consulta_page():
-    # 🔍 Página de consulta de clientes
-    return send_from_directory("../frontend", "consulta.html")
+    return send_from_directory(FRONTEND_DIR, "consulta.html")
 
 
+# Página de Alteração
 @app.route("/alterar")
 def alterar_page():
-    # ✏️ Página de alteração de dados
-    return send_from_directory("../frontend", "alterar.html")
+    return send_from_directory(FRONTEND_DIR, "alterar.html")
 
 
 # 📸 Rota para servir imagens, scripts ou outros arquivos na pasta “assets”
@@ -105,25 +88,14 @@ def assets(filename):
     return send_from_directory("../frontend/assets", filename)
 
 
-# =============================================================================
-# 🚀 API (INTERFACE DE COMUNICAÇÃO BACKEND ↔ FRONTEND)
-# =============================================================================
-# 💡 “API” = conjunto de rotas que permitem que o site envie e receba dados
-#    sem precisar recarregar a página inteira (usando JavaScript/JSON).
-# =============================================================================
-
-
 # -------------------------------------------------------------------------
 # 📦 CADASTRAR CLIENTE
 # -------------------------------------------------------------------------
 @app.route("/api/cadastrar", methods=["POST"])
 def cadastrar_cliente():
-    """
-    Recebe os dados do formulário (em JSON), valida e salva um novo cliente no Excel.
-    """
+    """Recebe os dados do formulário (em JSON), valida e salva um novo cliente no Excel."""
     try:
         data = request.json  # 📨 Dados enviados do frontend via POST (JSON)
-
         # ⚙️ Campos obrigatórios que o usuário deve preencher
         required_fields = ["nome", "cpf", "email", "telefone", "endereco"]
         if not all(field in data and data[field] for field in required_fields):
@@ -136,10 +108,8 @@ def cadastrar_cliente():
                 ),
                 400,
             )
-
         workbook = openpyxl.load_workbook(EXCEL_FILE)  # 📂 Abre o arquivo Excel
         sheet = workbook.active
-
         # 🧮 Cria um ID automático (último ID + 1)
         last_id = 0
         if sheet.max_row > 1:
@@ -154,13 +124,11 @@ def cadastrar_cliente():
             data.get("email"),
             data.get("telefone"),
             data.get("endereco"),
-            data.get("observacoes", ""),  # Campo opcional
+            data.get("observacao", ""),  # Campo opcional
             datetime.now().strftime("%Y-%m-%d"),  # 📅 Data atual
         ]
-
         sheet.append(novo_cliente)  # Adiciona nova linha no Excel
         workbook.save(EXCEL_FILE)  # 💾 Salva alterações
-
         # ✅ Retorna mensagem de sucesso
         return (
             jsonify(
@@ -172,7 +140,6 @@ def cadastrar_cliente():
             ),
             201,
         )
-
     except Exception as e:
         # ⚠️ Tratamento de erro genérico
         return (
@@ -182,7 +149,7 @@ def cadastrar_cliente():
 
 
 # -------------------------------------------------------------------------
-# 🔍 CONSULTAR CLIENTES
+# 🔍 CONSULTAR CLIENTES por nome
 # -------------------------------------------------------------------------
 @app.route("/api/buscar", methods=["GET"])
 def buscar_clientes():
@@ -240,7 +207,6 @@ def get_cliente(cliente_id):
 
         # ❌ Se não encontrar o ID
         return jsonify({"status": "error", "message": "Cliente não encontrado."}), 404
-
     except Exception as e:
         return (
             jsonify({"status": "error", "message": f"Erro ao buscar cliente: {e}"}),
@@ -251,23 +217,34 @@ def get_cliente(cliente_id):
 # -------------------------------------------------------------------------
 # ✏️ ATUALIZAR DADOS DE UM CLIENTE
 # -------------------------------------------------------------------------
+# 1. Definimos o "endereço" (rota) onde o navegador ou app deve bater para atualizar um cliente.
+# O <int:cliente_id> é o número único do hóspede que queremos encontrar.
+# POST indica que estamos enviando novos dados para o servidor.
 @app.route("/api/atualizar/<int:cliente_id>", methods=["POST"])
 def atualizar_cliente(cliente_id):
     """
-    Atualiza os dados de um cliente existente no Excel.
+    Função para alterar as informações de um hóspede no nosso banco de dados (Excel).
     """
     try:
+        # Pega o "pacote de dados" (JSON - JavaScript Object Notation) que veio da internet.
+        # Nele estão o novo nome, telefone, etc., que o usuário digitou no site.
         data = request.json
+
+        # Abre o nosso arquivo Excel (que funciona como o cérebro do hotel para guardar dados).
         workbook = openpyxl.load_workbook(EXCEL_FILE)
+
+        # Seleciona a página que está aberta/ativa no momento dentro do arquivo.
         sheet = workbook.active
-
-        # 🧭 Encontra o cliente pelo ID
+        # 🧭 BUSCA: Precisamos achar em qual linha do Excel este hóspede está.
+        # Começamos com -1 para indicar que, por enquanto, não o encontramos.
         row_to_update = -1
+        # O sistema começa a ler da linha 2 (pulando os títulos) até a última linha escrita.
         for row_idx in range(2, sheet.max_row + 1):
+            # Se o valor da primeira coluna (ID) for igual ao ID que recebemos, achamos!
             if sheet.cell(row=row_idx, column=1).value == cliente_id:
-                row_to_update = row_idx
-                break
-
+                row_to_update = row_idx  # Guardamos o número da linha.
+                break  # Para de procurar para economizar processamento.
+        # Se depois de ler tudo continuarmos com -1, o hóspede não existe.
         if row_to_update == -1:
             return (
                 jsonify(
@@ -276,19 +253,21 @@ def atualizar_cliente(cliente_id):
                         "message": "Cliente não encontrado para atualização.",
                     }
                 ),
-                404,
+                404,  # Código de erro padrão para "Não Encontrado".
             )
-
-        # 🧾 Atualiza as células com os novos dados
+        # 🧾 ESCRITA: Agora o sistema escreve as novas informações nas colunas certas daquela linha.
+        # Column 2 = Nome, Column 3 = CPF, e assim por diante.
         sheet.cell(row=row_to_update, column=2, value=data.get("nome"))
         sheet.cell(row=row_to_update, column=3, value=data.get("cpf"))
         sheet.cell(row=row_to_update, column=4, value=data.get("email"))
         sheet.cell(row=row_to_update, column=5, value=data.get("telefone"))
         sheet.cell(row=row_to_update, column=6, value=data.get("endereco"))
-        sheet.cell(row=row_to_update, column=7, value=data.get("observacoes"))
+        sheet.cell(row=row_to_update, column=7, value=data.get("observacao"))
 
-        workbook.save(EXCEL_FILE)  # 💾 Salva as alterações no Excel
+        # 💾 SALVAR: Importante! Se não salvar, as mudanças ficam só na memória e somem depois.
+        workbook.save(EXCEL_FILE)
 
+        # Retorna uma mensagem de sucesso para o Front-end mostrar na tela do usuário.
         return jsonify(
             {
                 "status": "success",
@@ -297,20 +276,19 @@ def atualizar_cliente(cliente_id):
         )
 
     except Exception as e:
+        # Se houver algum erro inesperado (ex: o arquivo Excel estar aberto por outra pessoa),
+        # o sistema "captura" o erro e avisa o que aconteceu, sem travar o programa todo.
         return (
             jsonify({"status": "error", "message": f"Erro ao atualizar dados: {e}"}),
-            500,
+            500,  # Código de erro para "Falha Interna no Servidor".
         )
 
 
-# =============================================================================
-# 🏁 PONTO DE ENTRADA DA APLICAÇÃO
-# =============================================================================
-# 💡 Este trecho garante que o app só será executado se o arquivo for rodado
-#    diretamente (python app.py), e não quando for importado.
-# =============================================================================
 if __name__ == "__main__":
-    init_excel()  # ⚙️ Cria o Excel caso ainda não exista
+    print("BASE_DIR:", BASE_DIR)
+    print("FRONTEND_DIR:", FRONTEND_DIR)
+    print("STATIC_DIR:", STATIC_DIR)
+    init_excel()
     app.run(
         debug=True, port=5000
     )  # 🚀 Inicia o servidor local em http://localhost:5000

@@ -88,13 +88,13 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault()
 
         // monta um objeto com os novos  dados digitais
-        const dados ={
+        const dados = {
             nome: nome.value,
-            CPF: cpf.value,
-            email: email.value
-            telefone: telefone.value
-            endereco: endereco.value
-            observacoes: observacoes.value
+            cpf: cpf.value,
+            email: email.value,
+            telefone: telefone.value,
+            endereco: endereco.value,
+            observacoes: observacoes.value,
         };
          
         //envia para o backend (rotas /apii/atualizar/<idv>)
