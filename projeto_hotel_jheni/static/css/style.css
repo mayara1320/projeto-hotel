@@ -1,0 +1,44 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+body{
+    /* fundo com degrade em tons de azul turqueza e azul escuro*/
+    background: linear-gradient(135deg, #00c2c7, #0077b6 );
+     
+    /*cor padrao do texto preto */
+    color:#000;
+
+    /* fonte limpa e moderna (sem serifa), compativel com todos os sites*/
+    font-family: 'segoe UI', tahoma, sans-sarif
+
+}
+ 
+ btn-primary{
+    background-color: #0077b6;
+     
+    /*cor da borda (ligeiramente mais escura)*/
+    border-color: #005f8a;
+ }
+  /*efeito visual quando o usuario passa o mouse sobre o botão*/
+  btn-primary:houver{
+     /* cor muda para azul-turqueza mais claro*/
+     background-color: #c7170095;
+
+     /* borda acompanha o tom do fundo*/
+     border-color: #b6000087 ;
+  }
+

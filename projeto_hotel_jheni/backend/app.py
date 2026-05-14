@@ -59,7 +59,6 @@ def init_excel():
 
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/" + STATIC_DIR)
 
-
 # =========================
 # ROTA PRINCIPAL (HTML)
 # ROTAS DAS PÁGINAS (FRONTEND)
